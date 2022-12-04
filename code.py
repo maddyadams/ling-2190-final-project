@@ -14,16 +14,17 @@ class UpdatableDistribution:
     def __init__(self, divisions: int):
         self.divisions = divisions
         self.weights = [i / (self.divisions - 1) for i in range(self.divisions)]
+        self.k = None
     
-    def sample(self) -> (float, int):
-        k = random.randrange(0, len(self.weights))
-        return self.weights[k], k
+    def sample(self) -> float:
+        self.k = random.randrange(0, len(self.weights))
+        return self.weights[self.k]
 
-    def increase(self, k: int):
-        self.weights[k] = min(1, self.weights[k] + 1 / (self.divisions - 1))
+    def increase(self, amt: float):
+        self.weights[self.k] = min(1, self.weights[self.k] + amt / (self.divisions - 1))
 
-    def decrease(self, k: int):
-        self.weights[k] = max(0, self.weights[k] - 1 / (self.divisions - 1))
+    def decrease(self, amt: float):
+        self.weights[self.k] = max(0, self.weights[self.k] - amt / (self.divisions - 1))
 
     def getStats(self) -> str:
         l = []
@@ -52,14 +53,26 @@ class UpdatableThreshold:
     def valuePasses(self, value: float) -> bool:
         return self.threshold <= value
     
-    def increase(self):
-        self.threshold = min(1, self.threshold + 1 / (self.divisions - 1))
+    def increase(self, amt: float):
+        self.threshold = min(1, self.threshold + amt / (self.divisions - 1))
     
-    def decrease(self):
-        self.threshold = max(0, self.threshold - 1 / (self.divisions - 1))
+    def decrease(self, amt: float):
+        self.threshold = max(0, self.threshold - amt / (self.divisions - 1))
 
-    def draw(self, ax, color, label):
-        ax.axvline(self.threshold, color=color, label=label)
+    def draw(self, ax, color, label, rect=None, divideBy2=False):
+        x = self.threshold / (2 if divideBy2 else 1)
+        if rect is None:
+            ax.axvline(x, color=color, label=label)
+        elif isinstance(rect, UniformDistribution):
+            if rect.a == rect.b:
+                ax.axvline(self.threshold, color=color, label=label)
+            else:
+                rect = patches.Rectangle((self.threshold, 0),
+                                         rect.b - rect.a, 1,
+                                         color=color)
+                ax.add_patch(rect)
+        else:
+            raise ValueError(f"rect: {rect}")
 
 class UniformDistribution:
     def __init__(self, a: float, b: float):
@@ -98,15 +111,25 @@ class CombinationFormula:
 class Simulation:
     def __init__(self, divisions: float, successThreshold: float,
                  combinationFormula: CombinationFormula,
-                 failureOverridesHiding: bool, successOverridesPerception: bool,
+                 honestGuessThresholdSensitivity: int,
+                 honestSuccessSensitivity: int,
+                 honestLowEffortSensitivity: int,
+                 honestPerceptionSensitivity: int,
+                 dishonestFailureSensitivity: int,
+                 dishonestPerceptionSensitivity: int,
+
                  honestGuessThreshold: float, honestAssignmentProbability: float,
                  noiseDistribution: UniformDistribution
                  ):
         self.divisions = divisions
         self.successThreshold = UpdatableThreshold(successThreshold, self.divisions)
         self.combinationFormula = combinationFormula
-        self.failureOverridesHiding = failureOverridesHiding
-        self.successOverridesPerception = successOverridesPerception
+        self.honestGuessThresholdSensitivity = honestGuessThresholdSensitivity
+        self.honestSuccessSensitivity = honestSuccessSensitivity
+        self.honestLowEffortSensitivity = honestLowEffortSensitivity
+        self.honestPerceptionSensitivity = honestPerceptionSensitivity
+        self.dishonestFailureSensitivity = dishonestFailureSensitivity
+        self.dishonestPerceptionSensitivity = dishonestPerceptionSensitivity
         self.honestGuessThreshold = UpdatableThreshold(honestGuessThreshold, self.divisions)
         self.honestAssignmentProbability = BernouilliDistribution(honestAssignmentProbability)
         self.noiseDistribution = noiseDistribution
@@ -125,8 +148,8 @@ class Simulation:
 
     def draw(self, ax):
         ax.clear()
-        self.successThreshold.draw(ax, "tab:red", "success threshold")
-        self.honestGuessThreshold.draw(ax, "tab:orange", "honest guess threshold")
+        self.successThreshold.draw(ax, "tab:red", "success threshold over 2", divideBy2=True)
+        self.honestGuessThreshold.draw(ax, "tab:orange", "honest guess threshold", rect=self.noiseDistribution)
         self.honestAssignmentProbability.draw(ax, "tab:olive", "honest assignment probability")
         self.noiseDistribution.draw(ax, "tab:green", "noise distribution")
         self.honestDistribution.draw(ax, "tab:blue", "honest distribution")
@@ -134,7 +157,8 @@ class Simulation:
         ax.legend()
         plt.pause(0.001)
 
-    def runManyTrials(self, nBatches, batchSize, drawPlot: bool=True):
+    def runManyTrials(self, nBatches, batchSize,
+                      validationNBatches, drawPlot: bool=True):
         if drawPlot:
             fig = plt.figure()
             ax = plt.subplot()
@@ -153,129 +177,103 @@ class Simulation:
                     print("")
 
                 # input()
-    
-    def trial(self):
+        
+        gameOutcomes = [self.gameOutcome() for _ in range(batchSize * validationNBatches)]
+        honestHonestGames = [g for g in gameOutcomes if g[0] and g[1]]
+        successfulHonestHonestGames = len([g for g in honestHonestGames if g[2]])
+        successfulGames = len([g for g in gameOutcomes if g[2]])
+        honestPerceivedHonest = len(
+            [g for g in gameOutcomes if g[0] and g[4]]
+            + [g for g in gameOutcomes if g[1] and g[3]]
+        )
+        honestPerceivedDishonest = len(
+            [g for g in gameOutcomes if g[0] and not g[4]]
+            + [g for g in gameOutcomes if g[1] and not g[3]]
+        )
+        dishonestPerceivedHonest = len(
+            [g for g in gameOutcomes if not g[0] and g[4]]
+            + [g for g in gameOutcomes if not g[1] and g[3]]
+        )
+        dishonestPerceivedDishonest = len(
+            [g for g in gameOutcomes if not g[0] and not g[4]]
+            + [g for g in gameOutcomes if not g[1] and not g[3]]
+        )
+
+        hhPercent = 100 * len(honestHonestGames) / (batchSize * validationNBatches)
+        shhgPercent = 100 * successfulHonestHonestGames / len(honestHonestGames) if len(honestHonestGames) != 0 else "na"
+        sPercent = 100 * successfulGames / (batchSize * validationNBatches)
+
+        honestPrecision = "na"
+        honestRecall = "na"
+        honestFscore = "na"
+
+        if honestPerceivedHonest != 0:
+            honestPrecision = honestPerceivedHonest / (honestPerceivedHonest + dishonestPerceivedHonest)
+            honestRecall = honestPerceivedHonest / (honestPerceivedHonest + honestPerceivedDishonest)
+            honestFscore = 2 * honestPrecision * honestRecall / (honestPrecision + honestRecall)
+        
+        print(f"validationSize: {batchSize * validationNBatches}")
+        print(f"hh games: {len(honestHonestGames)} ({hhPercent}% of games)")
+        print(f"shh games: {successfulHonestHonestGames} ({shhgPercent}% of hhg)")
+        print(f"s games: {successfulGames} ({sPercent}% of games)")
+        print(f"hph: {honestPerceivedHonest}")
+        print(f"hpd: {honestPerceivedDishonest}")
+        print(f"dph: {dishonestPerceivedHonest}")
+        print(f"dpd: {dishonestPerceivedDishonest}")
+        print(f"hPrec (ie /dph): {honestPrecision}")
+        print(f"hRec (ie /hpd): {honestRecall}")
+        print(f"hFscore: {honestFscore}")
+
+    def gameOutcome(self):
         # assign roles
         player1IsHonest = self.honestAssignmentProbability.sample()
         player2IsHonest = self.honestAssignmentProbability.sample()
 
-        vprint(f"roles: 1honest: {player1IsHonest}, 2honest: {player2IsHonest}")
-        
         # communication occurs
-        player1Effort, player1Key = self.honestDistribution.sample() if player1IsHonest else self.dishonestDistribution.sample()
-        player2Effort, player2Key = self.honestDistribution.sample() if player2IsHonest else self.dishonestDistribution.sample()        
+        player1Effort = self.honestDistribution.sample() if player1IsHonest else self.dishonestDistribution.sample()
+        player2Effort = self.honestDistribution.sample() if player2IsHonest else self.dishonestDistribution.sample()
         noiseEffort = self.noiseDistribution.sample()
-        vprint(f"efforts: 1: {player1Effort}, 2: {player2Effort}, noise: {noiseEffort}")
+
         communicationEffort = self.combinationFormula.combine([player1Effort, player2Effort], noiseEffort)
         communicationSucceeds = self.successThreshold.valuePasses(communicationEffort)
-        vprint(f"communication: {communicationEffort}, threshold: {self.successThreshold.threshold}, success: {communicationSucceeds}")
-        
         player1InformationForGuess = self.combinationFormula.combine([player2Effort], noiseEffort)
         player2InformationForGuess = self.combinationFormula.combine([player1Effort], noiseEffort)
-        vprint(f"info: 1: {player1InformationForGuess}, 2: {player2InformationForGuess}, threshold: {self.honestGuessThreshold.threshold}")
-        
+
         player1GuessesHonest = self.honestGuessThreshold.valuePasses(player1InformationForGuess)
         player2GuessesHonest = self.honestGuessThreshold.valuePasses(player2InformationForGuess)
-        vprint(f"guesses: 1: {player1GuessesHonest}, 2: {player2GuessesHonest}")
+
+        return (player1IsHonest, player2IsHonest,
+                communicationSucceeds,
+                player1GuessesHonest, player2GuessesHonest)
+    
+    def trial(self):
+        (player1IsHonest, player2IsHonest,
+         communicationSucceeds,
+         player1GuessesHonest, player2GuessesHonest) = self.gameOutcome()
 
         # honest guess threshold updates
-        if player1GuessesHonest and not player2IsHonest:
-            vprint(f"p1 wrong, increase")
-            self.honestGuessThreshold.increase()
-        elif not player1GuessesHonest and player2IsHonest:
-            vprint("p1 wrong, decrease")
-            self.honestGuessThreshold.decrease()
-
         if player2GuessesHonest and not player1IsHonest:
-            vprint("p2 wrong, increase")
-            self.honestGuessThreshold.increase()
+            self.honestGuessThreshold.increase(self.honestGuessThresholdSensitivity)
         elif not player2GuessesHonest and player1IsHonest:
-            vprint("p2 wrong, decrease")
-            self.honestGuessThreshold.decrease()
-
-        # player 1 effort update
-        if player1IsHonest:
-            if communicationSucceeds and player2GuessesHonest:
-                vprint("honest decr")
-                self.honestDistribution.decrease(player1Key)
-            elif not communicationSucceeds and not player2GuessesHonest:
-                vprint("honest incr")
-                self.honestDistribution.increase(player1Key)
-            elif communicationSucceeds and not player2GuessesHonest:
-                if self.successOverridesPerception:
-                    vprint("honest decr (sop)")
-                    self.honestDistribution.decrease(player1Key)
-                else:
-                    vprint("honest incr (not sop)")
-                    self.honestDistribution.increase(player1Key)
-            elif not communicationSucceeds and player2GuessesHonest:
-                if self.successOverridesPerception:
-                    vprint("honest incr (sop)")
-                    self.honestDistribution.increase(player1Key)
-                else:
-                    vprint("honest decr (not sop)")
-                    self.honestDistribution.decrease(player1Key)
-            else:
-                raise Exception("impossible! player1IsHonest")
-        else:
-            if communicationSucceeds and player2GuessesHonest:
-                vprint("dishonest decr")
-                self.dishonestDistribution.decrease(player1Key)
-            elif communicationSucceeds and not player2GuessesHonest:
-                if self.failureOverridesHiding:
-                    vprint("dishonest decr (foh)")
-                    self.dishonestDistribution.decrease(player1Key)
-                else:
-                    vprint("dishonest incr (not foh)")
-                    self.dishonestDistribution.increase(player1Key)
-            elif not communicationSucceeds and player2GuessesHonest:
-                vprint("dishonest pass")
-                pass
-            elif not communicationSucceeds and not player2GuessesHonest:
-                if self.failureOverridesHiding:
-                    vprint("dishonest pass (foh)")
-                    pass
-                else:
-                    vprint("dishonest incr (not foh)")
-                    self.dishonestDistribution.increase(player1Key)
-            else:
-                raise Exception("impossible: not player1IsHonest")
+            self.honestGuessThreshold.decrease(self.honestGuessThresholdSensitivity)
 
         # player 2 effort update
         if player2IsHonest:
-            if communicationSucceeds and player1GuessesHonest:
-                self.honestDistribution.decrease(player2Key)
-            elif not communicationSucceeds and not player1GuessesHonest:
-                self.honestDistribution.increase(player2Key)
-            elif communicationSucceeds and not player1GuessesHonest:
-                if self.successOverridesPerception:
-                    self.honestDistribution.decrease(player2Key)
-                else:
-                    self.honestDistribution.increase(player2Key)
-            elif not communicationSucceeds and player1GuessesHonest:
-                if self.successOverridesPerception:
-                    self.honestDistribution.increase(player2Key)
-                else:
-                    self.honestDistribution.decrease(player2Key)
+            if communicationSucceeds:
+                self.honestDistribution.decrease(self.honestLowEffortSensitivity)
+
             else:
-                raise Exception("impossible! player2IsHonest")
+                self.honestDistribution.increase(self.honestSuccessSensitivity)
+
+            if not player1GuessesHonest:
+                self.honestDistribution.increase(self.honestPerceptionSensitivity)
+
         else:
-            if communicationSucceeds and player1GuessesHonest:
-                self.dishonestDistribution.decrease(player2Key)
-            elif communicationSucceeds and not player1GuessesHonest:
-                if self.failureOverridesHiding:
-                    self.dishonestDistribution.decrease(player2Key)
-                else:
-                    self.dishonestDistribution.increase(player2Key)
-            elif not communicationSucceeds and player1GuessesHonest:
-                pass
-            elif not communicationSucceeds and not player1GuessesHonest:
-                if self.failureOverridesHiding:
-                    pass
-                else:
-                    self.dishonestDistribution.increase(player2Key)
-            else:
-                raise Exception("impossible: not player1IsHonest")
+            if communicationSucceeds:
+                self.dishonestDistribution.decrease(self.dishonestFailureSensitivity)
+
+            if not player1GuessesHonest:
+                self.dishonestDistribution.increase(self.dishonestPerceptionSensitivity)
 
 
 if __name__ == "__main__":
@@ -284,24 +282,34 @@ if __name__ == "__main__":
     divisions = 500
     successThreshold = 0.5
     combinationFormula = CombinationFormula("+")
-    failureOverridesHiding = False
-    successOverridesPerception = True
+    honestGuessThresholdSensitivity = 1
+    honestSuccessSensitivity = 1
+    honestLowEffortSensitivity = 0.5
+    honestPerceptionSensitivity = 0
+    dishonestFailureSensitivity = 1
+    dishonestPerceptionSensitivity = 0.5
+
     honestGuessThreshold = 0.5
     honestAssignmentProbability = 0.5
-    noiseDistribution = UniformDistribution(0, 0)
+    noiseDistribution = UniformDistribution(0, 0.5)
 
     nBatches = 1_000
     batchSize = 1000
-
+    validationNBatches = 10
 
     startTime = time.time()
     
     Simulation(divisions, successThreshold, combinationFormula,
-               failureOverridesHiding, successOverridesPerception,
+               honestGuessThresholdSensitivity,
+               honestSuccessSensitivity, honestLowEffortSensitivity,
+               honestPerceptionSensitivity,
+               dishonestFailureSensitivity, dishonestPerceptionSensitivity,
                honestGuessThreshold, honestAssignmentProbability,
                noiseDistribution
-               ).runManyTrials(nBatches, batchSize)
+               ).runManyTrials(nBatches, batchSize, validationNBatches)
 
 
     endTime = time.time()
     print(f"duration: {endTime - startTime}s")
+
+    input()
