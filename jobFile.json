@@ -1,0 +1,309 @@
+{
+    "metadata" : {
+        "nIterations": 100000000,
+        "saveFilePathExistsStrategy": "skip",
+        "verbose": false
+    },
+    "jobs": [
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.8)",
+                "noiseDistribution=UniformDistribution(0, 0.2)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j1.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.8)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j2.txt"
+        },
+        
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.8)",
+                "noiseDistribution=UniformDistribution(0.4, 0.6)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j3.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.8)",
+                "noiseDistribution=UniformDistribution(0.6, 0.8)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j4.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.8)",
+                "noiseDistribution=UniformDistribution(0.8, 1)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j5.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(1)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j6.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.99)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j7.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.97)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j8.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.95)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j9.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.9)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j10.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.5)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j11.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.5)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=2",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j12.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.5)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=3",
+                "honestAvoidsEffortSensitivity=1",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j13.txt"
+        },
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.5)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=2",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j14.txt"
+        },
+
+
+        {
+            "setup": [
+                "Simulator(granularity=5000",
+                
+                "successThreshold=0.5",
+                "honestAssignmentDistribution=BernouilliDistribution(0.5)",
+                "noiseDistribution=UniformDistribution(0.2, 0.4)",
+                
+                "guessesHonestThreshold=UpdatableThreshold(granularity=5000)",
+                "honestThresholdSensitivity=1",
+
+                "honestSuccessSensitivity=1",
+                "honestAvoidsEffortSensitivity=3",
+                "honestPerceptionSensitivity=1",
+                "dishonestFailureSensitivity=1",
+                "dishonestPerceptionSensitivity=1)"
+            ],
+            "saveFilePath": "./jobOutput/j15.txt"
+        }
+    ]
+}
