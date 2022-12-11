@@ -87,7 +87,7 @@ def plotSimulator(s: Simulator):
             range=(0, 1), density=True, histtype="bar",
             label="Dishonest Distribution",
             alpha=0.8)
-    ax.hist(s.noiseDistribution.getMass(s.granularity), bins=s.granularity,
+    ax.hist(s.noiseDistribution.getMass(s.granularity * 10), bins=s.granularity,
             range=(0, 1), density=True, histtype="bar",
             label="Noise Distribution",
             alpha=0.8)

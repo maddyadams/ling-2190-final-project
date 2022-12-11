@@ -1,9 +1,27 @@
+from __future__ import annotations
 from distributions import *
+import copy
 
 class Simulator:
     """
     Holds the environment for one simulation, and can simulate the communication game
     """
+
+    def copyWith(self, **kwargs) -> Simulator:
+        result = copy.deepcopy(self)
+        result.granularity = kwargs.get("granularity", self.granularity)
+        result.honestAssignmentDistribution.p = kwargs.get("honestAssignmentDistribution", self.honestAssignmentDistribution.p)
+        result.noiseDistribution.minValue = kwargs.get("noiseDistribution", (self.noiseDistribution.minValue, self.noiseDistribution.maxValue))[0]
+        result.noiseDistribution.maxValue = kwargs.get("noiseDistribution", (self.noiseDistribution.minValue, self.noiseDistribution.maxValue))[1]
+        result.guessesHonestThreshold.granularity = kwargs.get("guessesHonestThreshold", self.guessesHonestThreshold.granularity)
+        result.honestThresholdSensitivity = kwargs.get("honestThresholdSensitivity", self.honestThresholdSensitivity)
+        result.honestSuccessSensitivity = kwargs.get("honestSuccessSensitivity", self.honestSuccessSensitivity)
+        result.honestAvoidsEffortSensitivity = kwargs.get("honestAvoidsEffortSensitivity", self.honestAvoidsEffortSensitivity)
+        result.honestPerceptionSensitivity = kwargs.get("honestPerceptionSensitivity", self.honestPerceptionSensitivity)
+        result.dishonestFailureSensitivity = kwargs.get("dishonestFailureSensitivity", self.dishonestFailureSensitivity)
+        result.dishonestPerceptionSensitivity = kwargs.get("dishonestPerceptionSensitivity", self.dishonestPerceptionSensitivity)
+
+        return result
     
     def __init__(self,
                  granularity: float,
