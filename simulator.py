@@ -10,6 +10,7 @@ class Simulator:
     def copyWith(self, **kwargs) -> Simulator:
         result = copy.deepcopy(self)
         result.granularity = kwargs.get("granularity", self.granularity)
+        result.successThreshold = kwargs.get("successThreshold", self.successThreshold)
         result.honestAssignmentDistribution.p = kwargs.get("honestAssignmentDistribution", self.honestAssignmentDistribution.p)
         result.noiseDistribution.minValue = kwargs.get("noiseDistribution", (self.noiseDistribution.minValue, self.noiseDistribution.maxValue))[0]
         result.noiseDistribution.maxValue = kwargs.get("noiseDistribution", (self.noiseDistribution.minValue, self.noiseDistribution.maxValue))[1]

@@ -14,6 +14,9 @@ class BernouilliDistribution:
     def __repr__(self) -> str:
         return f"BernouilliDistribution({self.p})"
 
+    def __str__(self) -> str:
+        return f"BernouilliDistribution({self.p:.4f})"
+
     def sample(self) -> bool:
         return random.uniform(0, 1) <= self.p
 
@@ -28,6 +31,9 @@ class UniformDistribution:
 
     def __repr__(self) -> str:
         return f"UniformDistribution({self.minValue}, {self.maxValue})"
+
+    def __str__(self) -> str:
+        return f"UniformDistribution({self.minValue:.4f}, {self.maxValue:.4f})"
 
     def sample(self) -> float:
         return random.uniform(self.minValue, self.maxValue)
@@ -55,6 +61,11 @@ class UpdatableThreshold:
             f"{self.minValue}, {self.maxValue})"
         )
 
+    def __str__(self) -> str:
+        return (
+            f"UpdatableThreshold({self.granularity}, {self.threshold:.4f}, "
+            f"{self.minValue:.4f}, {self.maxValue:.4f})"
+        )
     
     def increase(self, byMultiple: float):
         self.threshold += byMultiple / self.granularity

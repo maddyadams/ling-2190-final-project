@@ -38,7 +38,7 @@ class Job:
 
             elif self.saveFilePathExistsStrategy == "resume":
                 with open(self.saveFilePath) as f:
-                    self.simulator = f.read()
+                    self.simulator = eval(f.read())
 
         if fileExisted:
             if self.saveFilePathExistsStrategy == "resume":
